@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping("/v1/movieinfos")
@@ -19,7 +21,7 @@ public class MovieInfoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    private Mono<MovieInfo> addMovieInfo(@RequestBody MovieInfo movieInfo){
+    private Mono<MovieInfo> addMovieInfo(@RequestBody @Valid MovieInfo movieInfo){
         return service.addMovieInfo(movieInfo);
     }
 

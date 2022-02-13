@@ -120,4 +120,41 @@ class MovieInfoControllerTest {
                 .expectBody()
                 .isEmpty();
     }
+    @Test
+    public void addMovieInfoValidation(){
+        MovieInfo a=new MovieInfo("A123s", "",
+                -2005, List.of("Raj", "Shetty"), LocalDate.parse("2015-06-15"));
+        when(service.addMovieInfo(isA(MovieInfo.class))).thenReturn(Mono.just(a));
+
+        var b= webTestClient
+                .post()
+                .uri(url)
+                .bodyValue(a)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .returnResult();
+        System.out.println(b);
+
+    }
+    @Test
+    public void addMovieInfoCastListValidation(){
+        MovieInfo a=new MovieInfo("A123s", "Love Mocktail",
+                2005, List.of("apple", ""), LocalDate.parse("2015-06-15"));
+        when(service.addMovieInfo(isA(MovieInfo.class))).thenReturn(Mono.just(a));
+
+        var b= webTestClient
+                .post()
+                .uri(url)
+                .bodyValue(a)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .returnResult();
+        System.out.println(b);
+
+    }
+
 }
