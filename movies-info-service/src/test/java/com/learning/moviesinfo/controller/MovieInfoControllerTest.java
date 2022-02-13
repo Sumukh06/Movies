@@ -47,6 +47,22 @@ class MovieInfoControllerTest {
                 .hasSize(2);
     }
     @Test
+    public void getAllMoviesByYear(){
+        var movieinfos = List.of(new MovieInfo(null, "Love Mocktail",
+                        2005, List.of("Raj", "Shetty"), LocalDate.parse("2015-06-15")),
+                new MovieInfo(null, "The Dark Knight",
+                        2008, List.of("Ajay", "Sushma"), LocalDate.parse("2018-07-18")));
+        when(service.findByYear(isA(Integer.class))).thenReturn(Flux.just(movieinfos.get(0)));
+        webTestClient
+                .get()
+                .uri(url+"/?year=2005")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(1);
+    }
+    @Test
     public void getOneMovieInfo(){
         MovieInfo a=new MovieInfo(null, "Love Mocktail",
                 2005, List.of("Raj", "Shetty"), LocalDate.parse("2015-06-15"));

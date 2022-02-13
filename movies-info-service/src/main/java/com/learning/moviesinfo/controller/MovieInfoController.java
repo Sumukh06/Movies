@@ -27,8 +27,13 @@ public class MovieInfoController {
     }
 
     @GetMapping
-    private Flux<MovieInfo> getAllMovies(){
+    private Flux<MovieInfo> getAllMovies(@RequestParam(value = "year",required = false) Integer year){
+       if(year!=null){
+           return service.findByYear(year);
+       }
+       else {
         return service.getAll();
+        }
     }
     @GetMapping("/{id}")
     private Mono<ResponseEntity<MovieInfo>> findOne(@PathVariable String id){
