@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -64,6 +65,18 @@ class MovieInfoControllerTest {
                 .verifyComplete();
     }
     @Test
+    public void getOneMovieInfoEmpty(){
+
+        when(service.findOne(isA(String.class))).thenReturn(Mono.empty());
+
+        var b=webTestClient
+                .get()
+                .uri(url+"/1")
+                .exchange()
+                .expectStatus()
+                .isEqualTo(404);
+    }
+    @Test
     public void addMovieInfo(){
         MovieInfo a=new MovieInfo("A123s", "Love Mocktail",
                 2005, List.of("Raj", "Shetty"), LocalDate.parse("2015-06-15"));
@@ -88,24 +101,40 @@ class MovieInfoControllerTest {
         String id="A123s";
         MovieInfo a=new MovieInfo(null, "Love Mocktail",
                 2005, List.of("Raj", "Shetty"), LocalDate.parse("2015-06-15"));
-        when(service.updateMovieInfo(isA(MovieInfo.class), isA(String.class))).thenReturn(Mono.just(
-                new MovieInfo("A123s", "Love Mocktail",
-                        2005, List.of("Raj", "Shetty"), LocalDate.parse("2015-06-15"))
-        ));
+        MovieInfo newB=new MovieInfo("A123s", "Love Mocktail",
+                2005, List.of("Raj", "Shetty"), LocalDate.parse("2015-06-15"));
+        when(service.updateMovieInfo(isA(MovieInfo.class), isA(String.class)))
+                .thenReturn(Mono.just(newB));
 
         var b= webTestClient
                 .put()
-                .uri(url+"/A123s")
+                .uri(url+"/{id}","A123s")
                 .bodyValue(a)
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .returnResult(MovieInfo.class)
                 .getResponseBody();
-
         StepVerifier.create(b)
-                .expectNextMatches(movieInfo -> movieInfo.getMovieInfoId().equals("A123s"))
+                .expectNext(newB)
                 .verifyComplete();
+    }
+    @Test
+    public void updateMovieInfoNotFound(){
+        String id="A123s";
+        MovieInfo a=new MovieInfo(null, "Love Mocktail",
+                2005, List.of("Raj", "Shetty"), LocalDate.parse("2015-06-15"));
+
+        when(service.updateMovieInfo(isA(MovieInfo.class), isA(String.class)))
+                .thenReturn(Mono.empty());
+
+        var b= webTestClient
+                .put()
+                .uri(url+"/{id}","A123s")
+                .bodyValue(a)
+                .exchange()
+                .expectStatus()
+                .isEqualTo(404);
     }
     @Test
     public void deleteMovieInfo(){
@@ -113,7 +142,7 @@ class MovieInfoControllerTest {
         when(service.deleteMovieInfo(isA(String.class))).thenReturn(Mono.empty());
         webTestClient
                 .delete()
-                .uri(url+"/hello")
+                .uri(url+"/{id}","hello")
                 .exchange()
                 .expectStatus()
                 .isNoContent()
