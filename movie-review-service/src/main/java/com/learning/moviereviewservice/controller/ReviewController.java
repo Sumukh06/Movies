@@ -39,6 +39,7 @@ public class ReviewController {
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteReview(@PathVariable String id){
         return service.delete(id);
     }
