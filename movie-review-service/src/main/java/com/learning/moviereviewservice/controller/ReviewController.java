@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.NotActiveException;
+
+
 @RestController
 @RequestMapping("/v1/reviews")
 public class ReviewController {
@@ -19,12 +22,8 @@ public class ReviewController {
         return  service.allReviews();
     }
     @GetMapping("/{id}")
-    public Flux<ResponseEntity<Review>> reviewBasedOnInfoId(@PathVariable Long id){
-        return service.findOne(id)
-                .map(review -> {
-                    return ResponseEntity.status(200).body(review);
-                })
-                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+    public Flux<Review> reviewBasedOnInfoId(@PathVariable Long id) throws NotActiveException {
+        return service.findOne(id);
     }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
